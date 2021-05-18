@@ -31,13 +31,13 @@ class OrderView extends StatefulWidget {
   OrderView({Key key, this.title}) : super(key: key);
 
   final String title;
-
   @override
   _OrderViewState createState() => new _OrderViewState();
 }
 
 class _OrderViewState extends State<OrderView> {
   @override
+  final OrderService _orderService = OrderService(Dio());
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -49,7 +49,7 @@ class _OrderViewState extends State<OrderView> {
         child: SizedBox(
           width: 380,
           child: FutureBuilder(
-              future: getOrders(),
+              future: _orderService.getOrders(),
               builder:
                   (BuildContext context, AsyncSnapshot<List<Order>> snapshot) {
                 return (snapshot.data != null)
@@ -118,7 +118,7 @@ class _OrderViewState extends State<OrderView> {
                                                 color: Colors.lightBlue),
                                           ),
                                           onPressed: () {
-                                            postData(snapshot.data[index].id
+                                             _orderService.postData(snapshot.data[index].id
                                                 .toString());
                                             setState(() {});
                                           },
