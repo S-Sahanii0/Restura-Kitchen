@@ -4,10 +4,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_app/services/order_service.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; //deserialize
 import 'dart:developer';
+
+import 'models/Order.dart';
 
 void main() => runApp(new Home()); //like a wrapper for rest of our app
 
@@ -34,48 +37,6 @@ class OrderView extends StatefulWidget {
 }
 
 class _OrderViewState extends State<OrderView> {
-  Dio dio = new Dio();
-
-
-  void postData(String id) async {
-    await dio
-        .post("https://restura-backend.herokuapp.com/api/bomb_order/" + id);
-    setState(() {});
-  }
-
-  Future<List<Order>> _getOrders() async {
-    print('hare');
-    final _authority = "restura-backend.herokuapp.com";
-    final _path = "/api/list_order";
-    var data = await http.get(Uri.https(_authority, _path));
-    print(data.headers);
-    var jsonData = json.decode(data.body) as List;
-    List<Order> orders = [];
-    print(jsonData.first['item'] as String);
-    print(jsonData.first['customer'] as String);
-    print(jsonData.first['quantity'] as int);
-    print(jsonData.first['status'] as bool);
-    print(DateTime.parse(jsonData.first['time']));
-    // List.from(json)
-
-    for (var o in jsonData) {
-      print(o);
-      Order order = Order(o['id'], o['customer'], o['item'], o['quantity'],
-          DateTime.parse(o['time']), o['status']);
-      print(order);
-
-      orders.add(order);
-    }
-    print(orders);
-    print("hi");
-    print(orders.length);
-    debugPrint(data.toString());
-    int i = orders.length;
-    log("the : $i");
-    // log
-    return orders;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +49,7 @@ class _OrderViewState extends State<OrderView> {
         child: SizedBox(
           width: 380,
           child: FutureBuilder(
-              future: _getOrders(),
+              future: getOrders(),
               builder:
                   (BuildContext context, AsyncSnapshot<List<Order>> snapshot) {
                 return (snapshot.data != null)
@@ -149,16 +110,19 @@ class _OrderViewState extends State<OrderView> {
                                         padding:
                                             const EdgeInsets.only(left: 30.0),
                                         child: OutlinedButton(
-                                            child: Text(
-                                              (snapshot.data[index].status)
-                                                  ? 'Complete'
-                                                  : 'Pending',
-                                              style: TextStyle(
-                                                  color: Colors.lightBlue),
-                                            ),
-                                            onPressed: () => postData(snapshot
-                                                .data[index].id
-                                                .toString())),
+                                          child: Text(
+                                            (snapshot.data[index].status)
+                                                ? 'Complete'
+                                                : 'Pending',
+                                            style: TextStyle(
+                                                color: Colors.lightBlue),
+                                          ),
+                                          onPressed: () {
+                                            postData(snapshot.data[index].id
+                                                .toString());
+                                            setState(() {});
+                                          },
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -179,36 +143,13 @@ class _OrderViewState extends State<OrderView> {
   }
 }
 
-class Order {
-  final int id;
-  final String customer;
-  final String item;
-  final int quantity;
-  final DateTime time;
-  final bool status;
-
-  Order(
-      this.id, this.customer, this.item, this.quantity, this.time, this.status);
-
-  Map<String, dynamic> toJson() {
-    return {
-      "id": this.id,
-      "customer": this.customer,
-      "item": this.item,
-      "quantity": this.quantity,
-      "time": this.time.toIso8601String(),
-      "status": this.status,
-    };
-  }
-
-  // factory Order.fromJson(Map<String, dynamic> json) {
-  //   return Order(
-  //     customer: json["customer"],
-  //     item: json["item"],
-  //     quantity: int.parse(json["quantity"]),
-  //     time: DateTime.parse(json["time"]),
-  //     status: json["status"].toLowerCase() == 'true',
-  //   );
-  // }
+// factory Order.fromJson(Map<String, dynamic> json) {
+//   return Order(
+//     customer: json["customer"],
+//     item: json["item"],
+//     quantity: int.parse(json["quantity"]),
+//     time: DateTime.parse(json["time"]),
+//     status: json["status"].toLowerCase() == 'true',
+//   );
+// }
 //
-}
