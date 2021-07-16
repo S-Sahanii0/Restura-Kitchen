@@ -45,98 +45,135 @@ class _OrderViewState extends State<OrderView> {
         centerTitle: true,
         backgroundColor: Colors.lightBlue[200],
       ),
-      body: Center(
-        child: SizedBox(
-          width: 380,
-          child: FutureBuilder(
-              future: _orderService.getOrders(),
-              builder:
-                  (BuildContext context, AsyncSnapshot<List<Order>> snapshot) {
-                return (snapshot.data != null)
-                    ? ListView.builder(
-                        itemCount: snapshot.data.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          print(snapshot.data);
-                          return Card(
-                            elevation: 8,
-                            margin: EdgeInsets.all(16),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20)),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 16), //todo make this 16
-                              child: ListTile(
-                                leading: Icon(
-                                  Icons.fastfood_outlined,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                                title: Container(
-                                  child: Row(
-                                    children: <Widget>[
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        // mainAxisAlignment: MainAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            (snapshot.data[index].item),
-                                            style: TextStyle(
-                                                color: Colors.lightBlue,
-                                                fontSize:
-                                                    16), //todo make the heading bigger and other small
-                                          ),
-                                          Text(
-                                            (snapshot.data[index].customer),
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                          Text(
-                                            "Quantity: " +
-                                                (snapshot.data[index].quantity
-                                                    .toString()),
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                          Text(
-                                            "Status: " +
-                                                (snapshot.data[index].status
-                                                    .toString()),
-                                            textAlign: TextAlign.left,
-                                            style: TextStyle(fontSize: 12),
-                                          ),
-                                        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ElevatedButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Container(
+                          height: 200,
+                          color: Colors.blue[100],
+                          child: Center(
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                    content: Text("bye"),
+                                  ));
+                                },
+                                child: Text("Tap Againn")),
+                          ),
+                        );
+                      });
+                },
+                child: Text("Tap here")),
+            Center(
+              child: SizedBox(
+                width: 380,
+                child: FutureBuilder(
+                    future: _orderService.getOrders(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<Order>> snapshot) {
+                      return (snapshot.data != null)
+                          ? ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: snapshot.data.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                print(snapshot.data);
+                                return Card(
+                                  elevation: 8,
+                                  margin: EdgeInsets.all(16),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16), //todo make this 16
+                                    child: ListTile(
+                                      leading: Icon(
+                                        Icons.fastfood_outlined,
+                                        color: Theme.of(context).primaryColor,
                                       ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 30.0),
-                                        child: OutlinedButton(
-                                          child: Text(
-                                            (snapshot.data[index].status)
-                                                ? 'Complete'
-                                                : 'Pending',
-                                            style: TextStyle(
-                                                color: Colors.lightBlue),
-                                          ),
-                                          onPressed: () {
-                                             _orderService.postData(snapshot.data[index].id
-                                                .toString());
-                                            setState(() {});
-                                          },
+                                      title: Container(
+                                        child: Row(
+                                          children: <Widget>[
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              // mainAxisAlignment: MainAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  (snapshot.data[index].item),
+                                                  style: TextStyle(
+                                                      color: Colors.lightBlue,
+                                                      fontSize:
+                                                          16), //todo make the heading bigger and other small
+                                                ),
+                                                Text(
+                                                  (snapshot
+                                                      .data[index].customer),
+                                                  textAlign: TextAlign.left,
+                                                  style:
+                                                      TextStyle(fontSize: 12),
+                                                ),
+                                                Text(
+                                                  "Quantity: " +
+                                                      (snapshot
+                                                          .data[index].quantity
+                                                          .toString()),
+                                                  textAlign: TextAlign.left,
+                                                  style:
+                                                      TextStyle(fontSize: 12),
+                                                ),
+                                                Text(
+                                                  "Status: " +
+                                                      (snapshot
+                                                          .data[index].status
+                                                          .toString()),
+                                                  textAlign: TextAlign.left,
+                                                  style:
+                                                      TextStyle(fontSize: 12),
+                                                ),
+                                              ],
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 30.0),
+                                              child: OutlinedButton(
+                                                child: Text(
+                                                  (snapshot.data[index].status)
+                                                      ? 'Complete'
+                                                      : 'Pending',
+                                                  style: TextStyle(
+                                                      color: Colors.lightBlue),
+                                                ),
+                                                onPressed: () {
+                                                  _orderService.postData(
+                                                      snapshot.data[index].id
+                                                          .toString());
+                                                  setState(() {});
+                                                },
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ],
+                                    ),
                                   ),
-                                ),
+                                );
+                              })
+                          : Container(
+                              child: Center(
+                                child: Text("Loading..."),
                               ),
-                            ),
-                          );
-                        })
-                    : Container(
-                        child: Center(
-                          child: Text("Loading..."),
-                        ),
-                      );
-              }),
+                            );
+                    }),
+              ),
+            ),
+          ],
         ),
       ),
     );
